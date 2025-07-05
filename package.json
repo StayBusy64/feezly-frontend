@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "feezly-frontend",
   "version": "1.0.0",
   "private": true,
@@ -24,3 +24,4 @@
     "typescript": "5.4.5"
   }
 }
+
