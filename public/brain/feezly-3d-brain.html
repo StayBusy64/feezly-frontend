@@ -7,7 +7,7 @@
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
   <script src="https://unpkg.com/3d-force-graph"></script>
   <script>
-    const Graph = ForceGraph3D()(document.body)
+    window.Graph = ForceGraph3D()(document.body)
       .nodeColor(n=>n.zone||'white')
       .nodeThreeObject(n=>{
         const s=new THREE.Sprite(new THREE.SpriteMaterial({color:n.color||'cyan'}));
@@ -25,4 +25,5 @@
   </script>
 </body>
 </html>
+
 
