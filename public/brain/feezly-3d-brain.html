@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>FEEZLY 3D Brain</title>
+  <style> html,body{margin:0;overflow:hidden;background:#000} </style>
+</head>
+<body>
+  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
+  <script src="https://unpkg.com/three-forcegraph"></script>
+  <script>
+    const Graph = ForceGraph3D()(document.body)
+      .nodeColor(n=>n.zone||'white')
+      .nodeThreeObject(n=>{
+        const s=new THREE.Sprite(new THREE.SpriteMaterial({color:n.color||'cyan'}));
+        s.scale.set(6,6,1); return s;
+      })
+      .linkWidth(0.5).linkColor(()=> 'gray')
+      .backgroundColor('black').showNavInfo(false);
+    fetch('graph.json').then(r=>r.json()).then(data=>Graph.graphData(data));
+    window.addEventListener('resize',()=>{
+      const camera = Graph.camera();
+      camera.aspect = window.innerWidth/window.innerHeight;
+      camera.updateProjectionMatrix();
+      Graph.renderer().setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
