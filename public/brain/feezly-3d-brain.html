@@ -1,29 +1,52 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><title>FEEZLY 3D Brain</title>
-  <style> html,body{margin:0;overflow:hidden;background:#000} </style>
-</head>
-<body>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FEEZLY 3D Brain</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; }
+    canvas { display: block; }
+  </style>
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
   <script src="https://unpkg.com/3d-force-graph"></script>
+</head>
+<body>
+  <div id="3d-graph"></div>
+
   <script>
-    window.Graph = ForceGraph3D()(document.body)
-      .nodeColor(n=>n.zone||'white')
-      .nodeThreeObject(n=>{
-        const s=new THREE.Sprite(new THREE.SpriteMaterial({color:n.color||'cyan'}));
-        s.scale.set(6,6,1); return s;
-      })
-      .linkWidth(0.5).linkColor(()=> 'gray')
-      .backgroundColor('black').showNavInfo(false);
-    fetch('graph.json').then(r=>r.json()).then(data=>Graph.graphData(data));
-    window.addEventListener('resize',()=>{
-      const camera = Graph.camera();
-      camera.aspect = window.innerWidth/window.innerHeight;
-      camera.updateProjectionMatrix();
-      Graph.renderer().setSize(window.innerWidth, window.innerHeight);
-    });
+    const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+      .nodeAutoColorBy('group')
+      .backgroundColor('#000')
+      .nodeLabel('id');
+
+    const socket = new WebSocket("wss://feezly-websocket-backend.onrender.com/ws");
+
+    socket.onopen = () => {
+      console.log("🌐 WebSocket connected");
+    };
+
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.nodes && data.links) {
+          console.log("🧠 Live graph update received:", data);
+          Graph.graphData(data);
+        } else {
+          console.warn("⚠️ Invalid graph data format", data);
+        }
+      } catch (err) {
+        console.error("❌ Failed to parse incoming graph data", err);
+      }
+    };
+
+    socket.onerror = (err) => {
+      console.error("❌ WebSocket error:", err);
+    };
+
+    socket.onclose = () => {
+      console.warn("🔌 WebSocket connection closed.");
+    };
   </script>
 </body>
 </html>
-
-
